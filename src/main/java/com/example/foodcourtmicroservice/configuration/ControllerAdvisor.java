@@ -5,9 +5,13 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.Da
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.PaginationException;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantEntityNotFoundException;
 import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderException;
+import com.example.foodcourtmicroservice.domain.exceptions.DifferentRestaurantException;
+import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException;
 import com.example.foodcourtmicroservice.domain.exceptions.IdPlateNotFoundException;
 import com.example.foodcourtmicroservice.domain.exceptions.NoProviderException;
+import com.example.foodcourtmicroservice.domain.exceptions.PlateBelongOtherRestaurantException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateNotFoundException;
+import com.example.foodcourtmicroservice.domain.exceptions.PlateStatusDisabledException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -25,10 +29,14 @@ import java.util.Map;
 import static com.example.foodcourtmicroservice.configuration.Constants.CATEGORY_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.CLIENT_HAS_ORDER_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.DATA_DUPLICATE_RESTAURANT_DTO;
+import static com.example.foodcourtmicroservice.configuration.Constants.DIFFERENT_RESTAURANT_ERROR;
+import static com.example.foodcourtmicroservice.configuration.Constants.ID_AND_ID_RESTAURANT_AND_STATUS_ORDER_NOT_FOUND;
 import static com.example.foodcourtmicroservice.configuration.Constants.ID_UPDATE_NOT_FOUND;
 import static com.example.foodcourtmicroservice.configuration.Constants.NO_PROVIDER_PERMISSION;
 import static com.example.foodcourtmicroservice.configuration.Constants.PAGINATION_ERROR;
+import static com.example.foodcourtmicroservice.configuration.Constants.PLATE_BELONG_OTHER_RESTAURANT_ERROR;
 import static com.example.foodcourtmicroservice.configuration.Constants.PLATE_NOT_FOUND;
+import static com.example.foodcourtmicroservice.configuration.Constants.PLATE_STATUS_DISABLED_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.RESPONSE_ERROR_MESSAGE_KEY;
 import static com.example.foodcourtmicroservice.configuration.Constants.RESTAURANT_ENTITY_NOT_FOUND;
 import static com.example.foodcourtmicroservice.configuration.Constants.WRONG_CREDENTIALS_MESSAGE;
@@ -102,5 +110,30 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleClientHasOrderException(ClientHasOrderException clientHasOrderException){
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, CLIENT_HAS_ORDER_EXCEPTION));
+    }
+
+    @ExceptionHandler(IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException.class)
+    public ResponseEntity<Map<String, String>> handleIdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException(IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException
+                                                                                                                 idOrderAndIdRestaurantAndOrderStatusPendingIsFalseException){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ID_AND_ID_RESTAURANT_AND_STATUS_ORDER_NOT_FOUND));
+    }
+
+    @ExceptionHandler(DifferentRestaurantException.class)
+    public ResponseEntity<Map<String, String>> handleDifferentRestaurantException(DifferentRestaurantException differentRestaurantException){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, DIFFERENT_RESTAURANT_ERROR));
+    }
+
+    @ExceptionHandler(PlateBelongOtherRestaurantException.class)
+    public ResponseEntity<Map<String, String>> handlePlateBelongOtherRestaurantException(PlateBelongOtherRestaurantException plateBelongOtherRestaurantException){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, PLATE_BELONG_OTHER_RESTAURANT_ERROR));
+    }
+
+    @ExceptionHandler(PlateStatusDisabledException.class)
+    public ResponseEntity<Map<String, String >> handlePlateStatusDisabledException(PlateStatusDisabledException plateStatusDisabledException){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, PLATE_STATUS_DISABLED_EXCEPTION));
     }
 }

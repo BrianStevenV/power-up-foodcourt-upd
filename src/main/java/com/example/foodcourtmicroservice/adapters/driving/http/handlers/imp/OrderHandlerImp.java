@@ -1,5 +1,6 @@
 package com.example.foodcourtmicroservice.adapters.driving.http.handlers.imp;
 
+import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.EmployeeAssignedOrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderPaginationEmployeeResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
@@ -29,5 +30,10 @@ public class OrderHandlerImp implements IOrderHandler {
     @Override
     public Page<OrderPaginationEmployeeResponseDto> getPaginationOrderForEmployee(Long idRestaurant, OrderStatusRequestDto orderStatusRequestDto, Integer sizePage) {
         return orderServicePort.getPaginationOrderForEmployee(idRestaurant, orderStatusRequestDto, sizePage);
+    }
+
+    @Override
+    public void employeeAssignedOrder(EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto) {
+        orderServicePort.employeeAssignedOrder(employeeAssignedOrderRequestDto);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.foodcourtmicroservice.adapters.driving.http.controller;
 
+import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.EmployeeAssignedOrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderPaginationEmployeeResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
@@ -25,9 +26,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -79,7 +80,7 @@ public class FoodCourtRestController {
                     @ApiResponse(responseCode = "409", description = "Plate already exists",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @PreAuthorize("hasAuthority('PROVIDER_ROLE')")
-    @PutMapping("plate/")
+    @PatchMapping("plate/")
     public ResponseEntity<Map<String,String>> updatePlate(@Valid @RequestBody UpdatePlateRequestDto updatePlateRequestDto){
         plateHandler.updatePlate(updatePlateRequestDto);
         return ResponseEntity.status(HttpStatus.OK)
@@ -93,7 +94,7 @@ public class FoodCourtRestController {
                     @ApiResponse(responseCode = "409", description = "Plate already exists",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @PreAuthorize("hasAuthority('PROVIDER_ROLE')")
-    @PutMapping("plate/status/{enabled}")
+    @PatchMapping("plate/status/{enabled}")  //Si funciona?
     public ResponseEntity<Map<String, String>> updateStatusPlate(@PathVariable Boolean enabled, @Valid @RequestBody PlateStatusUpdateRequestDto plateStatus){
         plateHandler.statusEnabledPlate(enabled, plateStatus);
         return ResponseEntity.status(HttpStatus.OK)
@@ -157,5 +158,18 @@ public class FoodCourtRestController {
         return orderHandler.getPaginationOrderForEmployee(idRestaurant, orderStatusRequestDto, sizePage);
     }
 
+    @Operation(summary = "Assign employee to order",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Assignation successful",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
+                    @ApiResponse(responseCode = "409", description = " Assignation error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @PreAuthorize("hasAuthority('EMPLOYEE_ROLE')")
+    @PatchMapping("orders/employee")
+    public ResponseEntity<Map<String, String>> assignEmployeeToOrder(@Valid @RequestBody EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto){
+        orderHandler.employeeAssignedOrder(employeeAssignedOrderRequestDto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.EMPLOYEE_TO_ORDER));
+    }
 
 }

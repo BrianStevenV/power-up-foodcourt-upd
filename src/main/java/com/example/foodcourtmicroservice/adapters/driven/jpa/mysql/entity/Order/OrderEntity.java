@@ -24,11 +24,8 @@ public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long idClient;
-
     private LocalDate date;
-
     private OrderStatusEntity orderStatusEntity = OrderStatusEntity.PENDING;
 
     private Long idEmployee;

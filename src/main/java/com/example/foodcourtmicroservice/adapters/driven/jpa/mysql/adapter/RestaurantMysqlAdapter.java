@@ -5,6 +5,7 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.Re
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.RestaurantPaginationResponseDto;
+import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +25,6 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     @Override
     public Long getByNameRestaurant(String nameRestaurant) {
         Optional<RestaurantEntity> restaurantEntity = restaurantRepository.findByName(nameRestaurant);
-
         return restaurantEntity.map(RestaurantEntity::getId).orElseThrow(() -> new RestaurantEntityNotFoundException());
     }
 
@@ -32,5 +32,11 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     public Page<RestaurantPaginationResponseDto> getPaginationRestaurants(Integer sizePage, String filter) {
         Pageable pageable = PageRequest.of(0, sizePage, Sort.by(filter).ascending());
         return restaurantRepository.findAll(pageable).map(restaurantEntityMapper::toRestaurantPaginationResponseDto);
+    }
+
+    @Override
+    public Restaurant findByIdAndIdOwner(Long id, Long idOwner) {
+        RestaurantEntity restaurantEntity = restaurantRepository.findByIdAndIdOwner(id, idOwner);
+        return restaurantEntityMapper.toRestaurant(restaurantEntity);
     }
 }

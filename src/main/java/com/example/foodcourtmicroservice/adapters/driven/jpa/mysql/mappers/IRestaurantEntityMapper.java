@@ -14,5 +14,6 @@ public interface IRestaurantEntityMapper {
     RestaurantEntity toEntity(Restaurant restaurant);
     RestaurantEntity toRestaurantEntity(RestaurantRequestDto restaurantRequestDto);
     RestaurantPaginationResponseDto toRestaurantPaginationResponseDto(RestaurantEntity restaurantEntity);
+    Restaurant toRestaurant (RestaurantEntity restaurantEntity);
 
 }

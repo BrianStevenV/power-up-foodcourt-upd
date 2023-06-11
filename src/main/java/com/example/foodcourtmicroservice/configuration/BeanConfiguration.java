@@ -93,7 +93,7 @@ public class BeanConfiguration {
 
     @Bean
     public IPlateServicePort plateServicePort() {
-        return new PlateUseCase(platePersistencePort(), categoryPersistencePort(), authenticationUserInfoServicePort);
+        return new PlateUseCase(platePersistencePort(), restaurantPersistencePort(),categoryPersistencePort(), authenticationUserInfoServicePort);
     }
 
     @Bean

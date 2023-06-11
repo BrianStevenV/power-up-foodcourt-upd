@@ -1,12 +1,18 @@
 package com.example.foodcourtmicroservice.domain.usecase;
 
+import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.EmployeeAssignedOrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderPaginationEmployeeResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
 import com.example.foodcourtmicroservice.domain.api.IAuthenticationUserInfoServicePort;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
 import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderException;
+import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException;
+import com.example.foodcourtmicroservice.domain.exceptions.PlateBelongOtherRestaurantException;
+import com.example.foodcourtmicroservice.domain.exceptions.PlateStatusDisabledException;
 import com.example.foodcourtmicroservice.domain.model.Order.Order;
+import com.example.foodcourtmicroservice.domain.model.Order.OrderStatus;
 import com.example.foodcourtmicroservice.domain.model.Order.PlateOrder;
+import com.example.foodcourtmicroservice.domain.model.Plate;
 import com.example.foodcourtmicroservice.domain.spi.IOrderPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IPlatePersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
@@ -14,7 +20,6 @@ import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public class OrderUseCase implements IOrderServicePort {
     private final IOrderPersistencePort orderPersistencePort;
@@ -32,18 +37,18 @@ public class OrderUseCase implements IOrderServicePort {
 
     @Override
     public void createOrder(String nameRestaurant, List<PlateOrder> plateOrderList) {
-        Order order = new Order();
-        Long idClient = authenticationUserInfoServicePort.getIdUserFromToken();
-        if(Boolean.TRUE.equals(orderPersistencePort.clientHasOrder(idClient))){
-            throw new ClientHasOrderException();
-        }
-        Optional<Long> idOptional = platePersistencePort.findById(plateOrderList.get(0).getIdPlate());
-        Long id = idOptional.orElse(null);
-        order.setIdClient(idClient);
-        order.setDate(LocalDate.now());
-        order.setIdRestaurant(restaurantPersistencePort.getByNameRestaurant(nameRestaurant));
-        plateOrderList.forEach(plate -> plate.setIdOrder(order.getId()));
-        plateOrderList.forEach(plate -> plate.setIdPlate(id));
+        Order order = buildOrder(nameRestaurant);
+
+        validateClientHasNoOrder(order.getIdClient());
+
+        plateOrderList.forEach(plateOrder -> {
+            Long plateId = plateOrder.getIdPlate();
+            validatePlateBelongsToRestaurant(plateId, order.getIdRestaurant());
+            validatePlateStatus(plateId);
+            plateOrder.setIdOrder(order.getId());
+            plateOrder.setIdPlate(plateId);
+        });
+
         orderPersistencePort.createOrder(order, plateOrderList);
     }
 
@@ -51,5 +56,53 @@ public class OrderUseCase implements IOrderServicePort {
     public Page<OrderPaginationEmployeeResponseDto> getPaginationOrderForEmployee(Long idRestaurant, OrderStatusRequestDto orderStatusRequestDto, Integer sizePage) {
         return orderPersistencePort.getPaginationOrderForEmployee(idRestaurant, orderStatusRequestDto, sizePage);
     }
+
+    @Override
+    public void employeeAssignedOrder(EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto) {
+        Long idEmployee = authenticationUserInfoServicePort.getIdUserFromToken();
+        employeeAssignedOrderRequestDto.getIdOrder().forEach(idOrder -> {
+            Order order = orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(idOrder, employeeAssignedOrderRequestDto.getIdRestaurant(), 0);
+            if(order != null){
+                order.setIdEmployee(idEmployee);
+                order.setOrderStatusEntity(OrderStatus.IN_PREPARATION);
+                orderPersistencePort.employeeAssignedOrder(order);
+            }   else {
+                throw new IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException();
+            }
+        });
+    }
+
+
+    private Order buildOrder(String nameRestaurant) {
+        Order order = new Order();
+        Long idClient = authenticationUserInfoServicePort.getIdUserFromToken();
+        Long idRestaurant = restaurantPersistencePort.getByNameRestaurant(nameRestaurant);
+        order.setIdClient(idClient);
+        order.setDate(LocalDate.now());
+        order.setIdRestaurant(idRestaurant);
+        return order;
+    }
+
+    private void validateClientHasNoOrder(Long idClient) {
+        if (orderPersistencePort.clientHasOrder(idClient)) {
+            throw new ClientHasOrderException();
+        }
+    }
+
+    private void validatePlateStatus(Long plateId) {
+        if (!platePersistencePort.findByStatus(plateId)) {
+            throw new PlateStatusDisabledException();
+        }
+    }
+
+    private void validatePlateBelongsToRestaurant(Long plateId, Long restaurantId) {
+        Plate plate = platePersistencePort.findByIdAndIdRestaurant(plateId, restaurantId);
+        if (plate == null) {
+            throw new PlateBelongOtherRestaurantException();
+        }
+    }
+
+
+
 
 }

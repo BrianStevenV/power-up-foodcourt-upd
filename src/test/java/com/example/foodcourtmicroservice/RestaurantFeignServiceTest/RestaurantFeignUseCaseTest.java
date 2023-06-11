@@ -45,11 +45,12 @@ public class RestaurantFeignUseCaseTest {
     public void getUserByDniMethodSuccessfulTest() {
         // Arrange
 
-        UserResponseDto userResponseDto = new UserResponseDto(20L,"123", "Prueba", "Prueba apellido",
+        Long idNumber = 20L;
+        UserResponseDto userResponseDto = new UserResponseDto(idNumber,"123", "Prueba", "Prueba apellido",
                 "email@example.com", "3126805081", LocalDate.of(2023, 3, 30),
                 "string", new RoleResponseDto("PROVIDER_ROLE", "PROVIDER_ROLE"));
 
-        Long idNumber = 20L;
+
 
         // Act
 
@@ -57,6 +58,7 @@ public class RestaurantFeignUseCaseTest {
         UserResponseDto result = restaurantFeignClient.getUserByDni(idNumber);
 
         // Assert
+
         assertNotNull(result);
         assertEquals("123", result.getDniNumber());
         assertEquals("Prueba", result.getName());

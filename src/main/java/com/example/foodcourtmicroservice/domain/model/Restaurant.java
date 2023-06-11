@@ -19,6 +19,8 @@ public class Restaurant {
         this.idOwner = idOwner;
     }
 
+    public Restaurant(){}
+
     public Long getId() {
         return id;
     }
