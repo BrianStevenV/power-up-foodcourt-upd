@@ -24,15 +24,14 @@ public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long idClient;
-
     private LocalDate date;
-
     private OrderStatusEntity orderStatusEntity = OrderStatusEntity.PENDING;
 
     private Long idEmployee;
 
     @JoinColumn(name = "id_restaurant")
     private Long idRestaurant;
+
+    private Long codeVerification;
 }

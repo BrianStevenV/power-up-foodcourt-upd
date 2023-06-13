@@ -1,10 +1,12 @@
 package com.example.foodcourtmicroservice.adapters.driving.http.handlers.imp;
 
+import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.EmployeeAssignedOrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderPaginationEmployeeResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.handlers.IOrderHandler;
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IPlateOrderRequestMapper;
+import com.example.foodcourtmicroservice.domain.api.IMessengerTwilioServicePort;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
 import com.example.foodcourtmicroservice.domain.model.Order.PlateOrder;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 public class OrderHandlerImp implements IOrderHandler {
     private final IOrderServicePort orderServicePort;
     private final IPlateOrderRequestMapper plateOrderMapper;
+    private final IMessengerTwilioServicePort messengerTwilioServicePort;
     @Override
     public void createOrder(OrderRequestDto orderRequestDto) {
         List<PlateOrder> plateOrderList = new ArrayList<>();
@@ -29,5 +32,15 @@ public class OrderHandlerImp implements IOrderHandler {
     @Override
     public Page<OrderPaginationEmployeeResponseDto> getPaginationOrderForEmployee(Long idRestaurant, OrderStatusRequestDto orderStatusRequestDto, Integer sizePage) {
         return orderServicePort.getPaginationOrderForEmployee(idRestaurant, orderStatusRequestDto, sizePage);
+    }
+
+    @Override
+    public void employeeAssignedOrder(EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto) {
+        orderServicePort.employeeAssignedOrder(employeeAssignedOrderRequestDto);
+    }
+
+    @Override
+    public String markOrderReady(Long id) {
+        return messengerTwilioServicePort.markOrderReady(id);
     }
 }

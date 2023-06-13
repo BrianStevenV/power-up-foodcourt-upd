@@ -25,9 +25,9 @@ public class PlateMysqlAdapter implements IPlatePersistencePort {
     }
 
     @Override
-    public Optional<PlateEntity> findByIdPlateEntity(Long id) {
-        Optional<PlateEntity> plateEntity = plateRepository.findById(id);
-        return plateEntity;
+    public Plate findByIdPlateEntity(Long id) {
+        PlateEntity plateEntity = plateRepository.findByIdPlateEntity(id);
+        return plateEntityMapper.toPlate(plateEntity);
     }
 
     @Override
@@ -57,6 +57,18 @@ public class PlateMysqlAdapter implements IPlatePersistencePort {
         Page<PlateEntity> platePage;
         platePage = plateRepository.findByRestaurantId(idRestaurant, pageable);
         return platePage.map(plateEntityMapper::toPlatePaginationResponseDto);
+    }
+
+    @Override
+    public Plate findByIdAndIdRestaurant(Long id, Long idRestaurant) {
+        PlateEntity plateEntity = plateRepository.findByIdAndIdRestaurant(id, idRestaurant);
+        return plateEntityMapper.toPlate(plateEntity);
+    }
+
+    @Override
+    public boolean findByStatus(Long idPlate) {
+        PlateEntity plateEntity = plateRepository.findByEnabled(idPlate);
+        return plateEntity != null ? plateEntity.getEnabled() : false;
     }
 
 

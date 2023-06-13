@@ -1,6 +1,6 @@
 package com.example.foodcourtmicroservice.domain.usecase;
 
-import com.example.foodcourtmicroservice.adapters.driving.http.controller.RestaurantFeignClient;
+import com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign.RestaurantFeignClient;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
 import com.example.foodcourtmicroservice.domain.exceptions.NoProviderException;
 import com.example.foodcourtmicroservice.domain.model.ConstantsDomain;

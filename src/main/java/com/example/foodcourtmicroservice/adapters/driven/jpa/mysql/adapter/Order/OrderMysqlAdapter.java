@@ -2,6 +2,7 @@ package com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter.Orde
 
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderEntity;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderPlateEntity;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderPlateIdEmbeddeable;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderStatusEntity;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.Order.IOrderEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.Order.IOrderPlateEntityMapper;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -28,17 +28,24 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     private final IOrderEntityMapper orderEntityMapper;
     private final IOrderPlateEntityMapper orderPlateEntityMapper;
     private final IOrderStatusEntityMapper orderStatusEntityMapper;
+
     @Override
     public void createOrder(Order order, List<PlateOrder> plateOrderList) {
         OrderEntity orderEntity = orderEntityMapper.toOrderEntity(order);
         orderRepository.save(orderEntity);
-        List<OrderPlateEntity> orderPlateEntityList = new ArrayList<>();
-        plateOrderList.forEach(plateOrderToEntity -> orderPlateEntityList.add(orderPlateEntityMapper.toOrderPlateEntity(plateOrderToEntity)));
-        orderPlateEntityList.forEach(plateOrderEntity -> plateOrderEntity.setIdOrder(orderRepository.findById(orderEntity.getId()).get().getId()));
-        orderPlateRepository.saveAll(orderPlateEntityList);
+
+        Long idOrder = orderEntity.getId();
+
+        plateOrderList.forEach(plateOrderToEntity -> {
+            OrderPlateEntity orderPlateEntity = orderPlateEntityMapper.toOrderPlateEntity(plateOrderToEntity);
+            OrderPlateIdEmbeddeable orderPlateIdEmbeddeable = new OrderPlateIdEmbeddeable();
+            orderPlateIdEmbeddeable.setOrderId(idOrder);
+            orderPlateIdEmbeddeable.setPlateId(plateOrderToEntity.getIdPlate());
+            orderPlateEntity.setOrderPlateIdEmbeddeable(orderPlateIdEmbeddeable);
+            orderPlateRepository.save(orderPlateEntity);
+        });
+
     }
-
-
     @Override
     public boolean clientHasOrder(Long id) {
         return orderRepository.findByIdClient(id);
@@ -54,5 +61,27 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
         return orderEntityPage.map(orderEntityMapper::toOrderPaginationEmployeeResponseDto);
     }
 
+    @Override
+    public Order validateIdAndIdRestaurantAndStatusOrder(Long id, Long idRestaurant, Integer orderStatus) {
+        OrderEntity orderEntity = orderRepository.findByIdAndIdRestaurantAndOrderStatus(id,idRestaurant, orderStatus);
+        return orderEntityMapper.toOrder(orderEntity);
+    }
+
+    @Override
+    public void employeeAssignedOrder(Order order) {
+        orderRepository.save(orderEntityMapper.toOrderEntity(order));
+    }
+
+    @Override
+    public Order validateIdAndStatusOrder(Long id) {
+        OrderEntity orderEntity = orderRepository.findByIdAndStatusOrder(id);
+        return orderEntityMapper.toOrder(orderEntity);
+    }
+
+    @Override
+    public OrderEntity saveOrder(Order order) {
+        OrderEntity orderEntity = orderEntityMapper.toOrderEntity(order);
+        return orderRepository.save(orderEntity);
+    }
 
 }

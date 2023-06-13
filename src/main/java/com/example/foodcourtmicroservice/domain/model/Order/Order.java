@@ -10,14 +10,16 @@ public class Order {
     private OrderStatus orderStatusEntity = OrderStatus.PENDING;
     private Long idEmployee;
     private Long idRestaurant;
+    private Long codeVerification;
 
-    public Order(Long id, Long idClient, LocalDate date, OrderStatus orderStatusEntity, Long idEmployee, Long idRestaurant) {
+    public Order(Long id, Long idClient, LocalDate date, OrderStatus orderStatusEntity, Long idEmployee, Long idRestaurant, Long codeVerification) {
         this.id = id;
         this.idClient = idClient;
         this.date = date;
         this.orderStatusEntity = orderStatusEntity;
         this.idEmployee = idEmployee;
         this.idRestaurant = idRestaurant;
+        this.codeVerification = codeVerification;
     }
     public Order(){}
 
@@ -67,5 +69,13 @@ public class Order {
 
     public void setIdRestaurant(Long idRestaurant) {
         this.idRestaurant = idRestaurant;
+    }
+
+    public Long getCodeVerification() {
+        return codeVerification;
+    }
+
+    public void setCodeVerification(Long codeVerification) {
+        this.codeVerification = codeVerification;
     }
 }

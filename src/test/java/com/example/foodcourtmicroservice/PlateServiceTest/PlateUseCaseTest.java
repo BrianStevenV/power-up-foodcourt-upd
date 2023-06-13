@@ -1,19 +1,19 @@
 package com.example.foodcourtmicroservice.PlateServiceTest;
 
-import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.PlateEntity;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.CategoryNotFoundException;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.PlatePaginationResponseDto;
 import com.example.foodcourtmicroservice.domain.api.IAuthenticationUserInfoServicePort;
-import com.example.foodcourtmicroservice.domain.exceptions.IdPlateNotFoundException;
+import com.example.foodcourtmicroservice.domain.exceptions.DifferentRestaurantException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateNotFoundException;
 import com.example.foodcourtmicroservice.domain.model.Plate;
+import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.spi.ICategoryPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IPlatePersistencePort;
+import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import com.example.foodcourtmicroservice.domain.usecase.PlateUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -25,17 +25,16 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +46,9 @@ public class PlateUseCaseTest {
     @Mock
     private ICategoryPersistencePort categoryPersistencePort;
 
+    @Mock
+    private IRestaurantPersistencePort restaurantPersistencePort;
+
     private IAuthenticationUserInfoServicePort authenticationUserInfoServicePort;
 
     private PlateUseCase plateUseCase;
@@ -54,21 +56,24 @@ public class PlateUseCaseTest {
     public void setUp(){
         MockitoAnnotations.openMocks(this);
         authenticationUserInfoServicePort = Mockito.mock(IAuthenticationUserInfoServicePort.class);
-        plateUseCase = new PlateUseCase(platePersistencePort, categoryPersistencePort, authenticationUserInfoServicePort);
+        plateUseCase = new PlateUseCase(platePersistencePort, restaurantPersistencePort, categoryPersistencePort, authenticationUserInfoServicePort);
     }
 
     @Test
     @DisplayName("Test: getCategoryByName - Success")
     public void getCategoryByNameMethodSuccessfulTest(){
         // Arrange
+
         String nameCategory = "VEGAN_CATEGORY";
         Long idCategory = 123L;
 
         // Act
+
         when(categoryPersistencePort.getCategoryByName(nameCategory)).thenReturn(idCategory);
         Long actualCategoryId = categoryPersistencePort.getCategoryByName(nameCategory);
 
         // Assert
+
         assertEquals(idCategory, actualCategoryId);
         verify(categoryPersistencePort).getCategoryByName(nameCategory);
     }
@@ -92,46 +97,83 @@ public class PlateUseCaseTest {
         verify(categoryPersistencePort).getCategoryByName(nameCategory);
     }
 
+
+
+    @DisplayName("Test: savePlate - Success")
     @Test
-    public void savePlateSuccessfulTest(){
+    public void savePlateSuccess() {
         // Arrange
 
-        Plate plate = new Plate(123L, "Prueba", "Food Test", 50.0, "Image.http", true,3L, 14L);
+        Long idRestaurant = 1L;
+        String categoryPlate = "SomeCategory";
+        Plate plate = new Plate();
+        plate.setName("PlateName");
+
+        Long idProvider = 2L;
+        when(authenticationUserInfoServicePort.getIdUserFromToken()).thenReturn(idProvider);
+
+        when(restaurantPersistencePort.findByIdAndIdOwner(idRestaurant, idProvider)).thenReturn(new Restaurant());
+
+        Long idCategory = 3L;
+        when(categoryPersistencePort.getCategoryByName(categoryPlate)).thenReturn(idCategory);
+
+        // Act
+
+        plateUseCase.savePlate(plate, idRestaurant, categoryPlate);
+
+        // Assert
+
+        verify(authenticationUserInfoServicePort, times(1)).getIdUserFromToken();
+        verify(restaurantPersistencePort, times(1)).findByIdAndIdOwner(idRestaurant, idProvider);
+        verify(categoryPersistencePort, times(1)).getCategoryByName(categoryPlate);
+        verify(platePersistencePort, times(1)).savePlate(plate);
+
+    }
+
+    @DisplayName("Test: savePlate - Failure (DifferentRestaurantException)")
+    @Test
+    public void savePlateDifferentRestaurantException() {
+        // Arrange
+
+        Plate plate = new Plate(123L, "Prueba", "Food Test", 50.0, "Image.http", true, 3L, 14L);
         Long idRestaurant = 14L;
-        String categoryPlate = "Category Test";
+        String categoryPlate = "Meat";
         Long expectedCategoryId = 3L;
 
         // Act
 
         when(categoryPersistencePort.getCategoryByName(categoryPlate)).thenReturn(expectedCategoryId);
         doNothing().when(platePersistencePort).savePlate(plate);
-        plateUseCase.savePlate(plate, idRestaurant, categoryPlate);
 
         // Assert
-        verify(categoryPersistencePort).getCategoryByName(categoryPlate);
-        verify(platePersistencePort).savePlate(plate);
+
+        assertThrows(DifferentRestaurantException.class, () -> {
+            plateUseCase.savePlate(plate, idRestaurant + 1, categoryPlate);
+        });
+
+        verify(platePersistencePort, never()).savePlate(any(Plate.class));
     }
+
+
 
     @Test
     @DisplayName("Test: getFindById - Success")
-    public void getFindByIdMethodSuccessfulTest(){
+    public void getFindByIdMethodSuccessfulTest() {
         // Arrange
 
         Long id = 123L;
-        PlateEntity plateEntity = new PlateEntity(id, "Mazorquita", "Great Food", 75.0,"image.http",true,3L,14L);
+        Plate plate = new Plate(id, "Mazorquita", "Great Food", 75.0, "image.http", true, 3L, 14L);
 
+        // Act
 
-        //Act
-
-        when(platePersistencePort.findByIdPlateEntity(id)).thenReturn(Optional.of(plateEntity));
-        Optional<PlateEntity> optionalPlateEntity = platePersistencePort.findByIdPlateEntity(id);
-        PlateEntity retrievedPlateEntity = optionalPlateEntity.get();
+        when(platePersistencePort.findByIdPlateEntity(id)).thenReturn(plate);
+        Plate retrievedPlate = platePersistencePort.findByIdPlateEntity(id);
 
         // Assert
 
-        assertTrue(optionalPlateEntity.isPresent());
-        assertEquals(id, retrievedPlateEntity.getId());
-        assertEquals("Mazorquita", retrievedPlateEntity.getName());
+        assertNotNull(retrievedPlate);
+        assertEquals(id, retrievedPlate.getId());
+        assertEquals("Mazorquita", retrievedPlate.getName());
         verify(platePersistencePort).findByIdPlateEntity(id);
     }
 
@@ -140,38 +182,18 @@ public class PlateUseCaseTest {
     public void getFindByIdMethodFailureTest() {
         // Arrange
 
-        Long id = 123L;
-        Optional<PlateEntity> optionalPlateEntity = platePersistencePort.findByIdPlateEntity(id);
+        Long plateId = 1L;
+        when(platePersistencePort.findByIdPlateEntity(plateId)).thenReturn(null);
 
         // Act
 
-        when(platePersistencePort.findByIdPlateEntity(id)).thenReturn(Optional.empty());
-
-        // Assert
-        assertFalse(optionalPlateEntity.isPresent());
-        verify(platePersistencePort).findByIdPlateEntity(id);
-    }
-
-    @Test
-    @DisplayName("Test: updatePlate - Failure (IdPlateNotFoundException)")
-    public void updatePlateServiceExceptionTest() {
-        // Arrange
-
-        Long id = 123L;
-        Plate plate = new Plate();
-        plate.setId(id);
-        plate.setPrice(50.0);
-        plate.setDescription("Updated Plate");
-
-        // Act
-
-        when(platePersistencePort.findByIdPlateEntity(id)).thenReturn(Optional.empty());
+        Plate result = platePersistencePort.findByIdPlateEntity(plateId);
 
         // Assert
 
-        assertThrows(IdPlateNotFoundException.class, () -> plateUseCase.updatePlate(plate));
-        verify(platePersistencePort).findByIdPlateEntity(id);
-        verify(platePersistencePort, never()).savePlate(any(Plate.class));
+        assertNull(result);
+        verify(platePersistencePort, times(1)).findByIdPlateEntity(plateId);
+
     }
 
     @Test
@@ -179,43 +201,76 @@ public class PlateUseCaseTest {
     public void updatePlateServiceSuccessfulTest(){
         // Arrange
 
-        Long id = 123L;
-        Plate plate = new Plate();
-        plate.setId(id);
-        plate.setPrice(50.0);
-        plate.setDescription("Updated Plate");
+        Long idProvider = 123L;
+        Long plateId = 456L;
+        Long restaurantId = 789L;
 
-        when(platePersistencePort.findByIdPlateEntity(id)).thenReturn(Optional.of(new PlateEntity()));
+        Plate existingPlate = new Plate();
+        existingPlate.setId(plateId);
+        existingPlate.setIdRestaurant(restaurantId);
+
+
+        Plate updatedPlate = new Plate();
+        updatedPlate.setId(plateId);
+        updatedPlate.setIdRestaurant(restaurantId);
+
+
+        when(authenticationUserInfoServicePort.getIdUserFromToken()).thenReturn(idProvider);
+        when(platePersistencePort.findByIdPlateEntity(plateId)).thenReturn(existingPlate);
+        when(restaurantPersistencePort.findByIdAndIdOwner(restaurantId, idProvider)).thenReturn(new Restaurant());
+        doNothing().when(platePersistencePort).savePlate(updatedPlate);
 
         // Act
 
-        plateUseCase.updatePlate(plate);
+        plateUseCase.updatePlate(updatedPlate);
 
         // Assert
 
-        verify(platePersistencePort).findByIdPlateEntity(id);
-        verify(platePersistencePort).savePlate(plate);
+        verify(authenticationUserInfoServicePort).getIdUserFromToken();
+        verify(platePersistencePort).findByIdPlateEntity(plateId);
+        verify(restaurantPersistencePort).findByIdAndIdOwner(restaurantId, idProvider);
+        verify(platePersistencePort).savePlate(updatedPlate);
+
     }
 
     @Test
     @DisplayName("Test: updateStatusPlate - Success")
     public void updateStatusPlateSuccessfulTest() {
         // Arrange
-        Boolean enabled = true;
-        Plate plate = new Plate(123L, "Prueba", "Food Test", 50.0, "Image.http", false, 3L, 14L);
-        Plate updatedPlate = new Plate(123L, "Prueba", "Food Test", 50.0, "Image.http", enabled, 3L, 14L);
 
-        when(platePersistencePort.statusEnabledPlate(any(Plate.class))).thenReturn(plate);
-        ArgumentCaptor<Plate> plateCaptor = ArgumentCaptor.forClass(Plate.class);
+        Long idRestaurant = 1L;
+        Long idOwner = 2L;
+
+        String token = "validToken";
+        String name = "Plate Name";
+
+        Plate plate = new Plate();
+        plate.setIdRestaurant(idRestaurant);
+        plate.setName(name);
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(idRestaurant);
+        restaurant.setIdOwner(idOwner);
+
+        Plate updatedPlate = new Plate();
+        updatedPlate.setIdRestaurant(idRestaurant);
+        updatedPlate.setName(name);
+        updatedPlate.setEnabled(true);
+
+        when(authenticationUserInfoServicePort.getIdentifierUserFromToken()).thenReturn(token);
+        when(authenticationUserInfoServicePort.getIdUserFromToken()).thenReturn(idOwner);
+        when(restaurantPersistencePort.findByIdAndIdOwner(idRestaurant, idOwner)).thenReturn(restaurant);
+        when(platePersistencePort.statusEnabledPlate(plate)).thenReturn(updatedPlate);
 
         // Act
-        plateUseCase.statusEnabledPlate(enabled, plate);
+
+        plateUseCase.statusEnabledPlate(true, plate);
 
         // Assert
-        verify(platePersistencePort).statusEnabledPlate(any(Plate.class));
-        verify(platePersistencePort).savePlate(plateCaptor.capture());
-        Plate capturedPlate = plateCaptor.getValue();
-        assertNotEquals(updatedPlate, capturedPlate);
+
+        assertTrue(updatedPlate.getEnabled());
+        verify(platePersistencePort, times(1)).savePlate(updatedPlate);
+
     }
 
 
@@ -225,19 +280,28 @@ public class PlateUseCaseTest {
     public void updateStatusPlateThrowsPlateNotFoundExceptionTest() {
         // Arrange
 
-        Boolean enabled = true;
-        Plate plate = new Plate(123L, "Prueba", "Food Test", 50.0, "Image.http", true,3L, 14L);
+        Long idRestaurant = 1L;
+        Long idOwner = 2L;
 
-        // Act
+        String token = "validToken";
+        String name = "Non-existent Plate Name";
 
-        when(platePersistencePort.statusEnabledPlate(any(Plate.class))).thenReturn(null);
+        Plate plate = new Plate();
+        plate.setIdRestaurant(idRestaurant);
+        plate.setName(name);
 
-        // Assert
+        when(authenticationUserInfoServicePort.getIdentifierUserFromToken()).thenReturn(token);
+        when(authenticationUserInfoServicePort.getIdUserFromToken()).thenReturn(idOwner);
+        when(restaurantPersistencePort.findByIdAndIdOwner(idRestaurant, idOwner)).thenReturn(new Restaurant());
+        when(platePersistencePort.statusEnabledPlate(plate)).thenReturn(null);
+
+        // Act & Assert
 
         assertThrows(PlateNotFoundException.class, () -> {
-            plateUseCase.statusEnabledPlate(enabled,plate);
+            plateUseCase.statusEnabledPlate(true, plate);
         });
-        verify(platePersistencePort).statusEnabledPlate(any(Plate.class));
+
+        verify(platePersistencePort, never()).savePlate(any());
     }
 
     @Test
@@ -253,9 +317,11 @@ public class PlateUseCaseTest {
                 .thenReturn(null);
 
         // Act
+
         Page<PlatePaginationResponseDto> actualPage = plateUseCase.getPaginationPlates(idRestaurant, pageSize, sortBy, null);
 
         // Assert
+
         assertEquals(null, actualPage);
     }
 
@@ -273,9 +339,11 @@ public class PlateUseCaseTest {
                 .thenReturn(null);
 
         // Act
+
         Page<PlatePaginationResponseDto> actualPage = plateUseCase.getPaginationPlates(idRestaurant, pageSize, sortBy, idCategory);
 
         // Assert
+
         assertEquals(null, actualPage);
     }
 
@@ -299,6 +367,7 @@ public class PlateUseCaseTest {
         Page<PlatePaginationResponseDto> actualPage = plateUseCase.getPaginationPlates(idRestaurant, pageSize, sortBy, null);
 
         // Assert
+
         assertEquals(expectedPage, actualPage);
     }
 
@@ -324,6 +393,7 @@ public class PlateUseCaseTest {
         Page<PlatePaginationResponseDto> actualPage = plateUseCase.getPaginationPlates(idRestaurant, pageSize, sortBy, idCategory);
 
         // Assert
+
         assertEquals(expectedPage, actualPage);
     }
 
