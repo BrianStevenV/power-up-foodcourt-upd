@@ -199,4 +199,18 @@ public class FoodCourtRestController {
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_DELIVERED_MARKED));
     }
 
+    @Operation(summary = "Cancel to order.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "The action cancel was successful.",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
+                    @ApiResponse(responseCode = "409", description = " Cancel error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @PreAuthorize("hasAuthority('CLIENT_ROLE')")
+    @PatchMapping("orders/action/cancel/{id}")
+    public ResponseEntity<Map<String, String >> cancelToOrder(@PathVariable("id") Long id){
+        orderHandler.cancelToOrder(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.CANCEL_ORDER));
+    }
+
 }

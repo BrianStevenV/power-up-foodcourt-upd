@@ -48,4 +48,9 @@ public class OrderHandlerImp implements IOrderHandler {
     public void markOrderDelivered(Long id, Long codeOrderVerification) {
         orderServicePort.markOrderDelivered(id, codeOrderVerification);
     }
+
+    @Override
+    public void cancelToOrder(Long id) {
+        orderServicePort.cancelToOrder(id);
+    }
 }

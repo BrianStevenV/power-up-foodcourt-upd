@@ -5,6 +5,7 @@ import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.Orde
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
 import com.example.foodcourtmicroservice.domain.api.IAuthenticationUserInfoServicePort;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
+import com.example.foodcourtmicroservice.domain.exceptions.CancelToOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException;
 import com.example.foodcourtmicroservice.domain.exceptions.MarkOrderDeliveredException;
@@ -84,6 +85,19 @@ public class OrderUseCase implements IOrderServicePort {
         }
     }
 
+    @Override
+    public void cancelToOrder(Long id) {
+        Long idClient = authenticationUserInfoServicePort.getIdUserFromToken();
+        Order order =  orderPersistencePort.ValidateIdAndStatusOrderAndIdClient(id, idClient);
+        if(order != null){
+            order.setOrderStatusEntity(OrderStatus.CANCELED);
+            orderPersistencePort.saveOrder(order);
+        }   else{
+            throw new CancelToOrderException();
+        }
+
+    }
+
 
     private Order buildOrder(String nameRestaurant) {
         Order order = new Order();
@@ -113,8 +127,6 @@ public class OrderUseCase implements IOrderServicePort {
             throw new PlateBelongOtherRestaurantException();
         }
     }
-
-
 
 
 }

@@ -14,6 +14,7 @@ public class Constants {
     public static final String PLATE_BELONG_OTHER_RESTAURANT_ERROR = "Plate belong other restaurant or Plate not found, you can only order food from the same restaurant.";
     public static final String ID_AND_ID_RESTAURANT_AND_STATUS_ORDER_NOT_FOUND = "Order, Restaurant and Status order not found, Please, the order must belong to the same restaurant and pending status.";
     public static final String DIFFERENT_RESTAURANT_ERROR = "The owner belong other restaurant.";
+    public static final String CANCEL_TO_ORDER_EXCEPTION = "Sorry, The order is in preparation and is not possible to cancel it.";
     public static final String UPDATE_PLATE_OK = "Updated information.";
     public static final String ORDER_DELIVERED_MARKED = "The Order was delivered.";
     public static final String ORDER_DELIVERED_MARKED_EXCEPTION = "Order, Status or verification code is wrong.";
@@ -21,7 +22,7 @@ public class Constants {
     public static final String CATEGORY_EXCEPTION = "Category not found.";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
     public static final String ID_UPDATE_NOT_FOUND = "Id Plate not is found.";
-    public static final String MARK_ORDER_READY = "The order is ready.";
+    public static final String CANCEL_ORDER = "The order is cancelled.";
     public static final String ORDER_TO_READY_NOT_AVAILABLE_EXCEPTION = "Order to ready not available.";
     public static final String RESPONSE_MESSAGE_KEY = "message";
     public static final String RESTAURANT_CREATED_MESSAGE = "Restaurant created successfully.";
