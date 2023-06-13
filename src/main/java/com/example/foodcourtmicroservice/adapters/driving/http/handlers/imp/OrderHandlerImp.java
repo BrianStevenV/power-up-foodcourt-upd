@@ -43,4 +43,9 @@ public class OrderHandlerImp implements IOrderHandler {
     public String markOrderReady(Long id) {
         return messengerTwilioServicePort.markOrderReady(id);
     }
+
+    @Override
+    public void markOrderDelivered(Long id, Long codeOrderVerification) {
+        orderServicePort.markOrderDelivered(id, codeOrderVerification);
+    }
 }

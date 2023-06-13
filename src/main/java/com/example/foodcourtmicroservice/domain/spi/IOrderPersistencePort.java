@@ -20,6 +20,7 @@ public interface IOrderPersistencePort {
     Order validateIdAndIdRestaurantAndStatusOrder(Long id, Long idRestaurant, Integer orderStatus);
 
     Order validateIdAndStatusOrder(Long id);
+    Order validateIdAndStatusOrderAndCodeVerification(Long id, Long codeOrderVerification);
 
     void saveOrder(Order order);
 }

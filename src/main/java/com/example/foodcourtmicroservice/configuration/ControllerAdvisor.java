@@ -8,6 +8,7 @@ import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderExcepti
 import com.example.foodcourtmicroservice.domain.exceptions.DifferentRestaurantException;
 import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException;
 import com.example.foodcourtmicroservice.domain.exceptions.IdPlateNotFoundException;
+import com.example.foodcourtmicroservice.domain.exceptions.MarkOrderDeliveredException;
 import com.example.foodcourtmicroservice.domain.exceptions.NoProviderException;
 import com.example.foodcourtmicroservice.domain.exceptions.OrderToReadyNotAvailableException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateBelongOtherRestaurantException;
@@ -34,6 +35,7 @@ import static com.example.foodcourtmicroservice.configuration.Constants.DIFFEREN
 import static com.example.foodcourtmicroservice.configuration.Constants.ID_AND_ID_RESTAURANT_AND_STATUS_ORDER_NOT_FOUND;
 import static com.example.foodcourtmicroservice.configuration.Constants.ID_UPDATE_NOT_FOUND;
 import static com.example.foodcourtmicroservice.configuration.Constants.NO_PROVIDER_PERMISSION;
+import static com.example.foodcourtmicroservice.configuration.Constants.ORDER_DELIVERED_MARKED_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.ORDER_TO_READY_NOT_AVAILABLE_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.PAGINATION_ERROR;
 import static com.example.foodcourtmicroservice.configuration.Constants.PLATE_BELONG_OTHER_RESTAURANT_ERROR;
@@ -143,5 +145,11 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleOrderToReadyNotAvailableException(OrderToReadyNotAvailableException orderToReadyNotAvailableException){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_TO_READY_NOT_AVAILABLE_EXCEPTION));
+    }
+
+    @ExceptionHandler(MarkOrderDeliveredException.class)
+    public ResponseEntity<Map<String, String>> handleMarkOrderDeliveredException(MarkOrderDeliveredException markOrderDeliveredException){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY,ORDER_DELIVERED_MARKED_EXCEPTION ));
     }
 }

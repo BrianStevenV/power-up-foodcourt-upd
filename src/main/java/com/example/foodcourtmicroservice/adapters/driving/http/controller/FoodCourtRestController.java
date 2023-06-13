@@ -172,7 +172,7 @@ public class FoodCourtRestController {
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.EMPLOYEE_TO_ORDER));
     }
 
-    @Operation(summary = "Mark order to ready.",
+    @Operation(summary = "Mark ready order.",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Marked success",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
@@ -183,6 +183,20 @@ public class FoodCourtRestController {
     public ResponseEntity<Map<String, String>> markOrderReady(@PathVariable("id") Long id){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, orderHandler.markOrderReady(id)));
+    }
+
+    @Operation(summary = "Mark delivered order.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Marked success",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
+                    @ApiResponse(responseCode = "409", description = " Marked error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @PreAuthorize("hasAuthority('EMPLOYEE_ROLE')")
+    @PatchMapping("orders/action/delivered/")
+    public ResponseEntity<Map<String, String>> markOrderDelivered(@RequestParam Long id, @RequestParam Long codeOrderVerification){
+        orderHandler.markOrderDelivered(id, codeOrderVerification);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_DELIVERED_MARKED));
     }
 
 }
