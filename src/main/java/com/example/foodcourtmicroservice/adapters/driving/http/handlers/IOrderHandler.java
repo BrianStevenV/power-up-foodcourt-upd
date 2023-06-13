@@ -12,4 +12,6 @@ public interface IOrderHandler {
     void employeeAssignedOrder(EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto);
 
     String markOrderReady(Long id);
+
+    void markOrderDelivered(Long id, Long codeOrderVerification);
 }

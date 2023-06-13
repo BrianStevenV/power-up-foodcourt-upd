@@ -19,4 +19,6 @@ public interface IOrderRepository extends JpaRepository<OrderEntity, Long> {
     OrderEntity findByIdAndIdRestaurantAndOrderStatus(@Param("id") Long id, @Param("idRestaurant")Long idRestaurant, @Param("orderStatus") Integer orderStatusEntity);
     @Query(value = "SELECT * FROM orders WHERE id = :id AND order_status_entity = 1", nativeQuery = true)
     OrderEntity findByIdAndStatusOrder(@Param("id") Long id);
+    @Query(value = "SELECT * FROM orders WHERE id = :id AND order_status_entity = 2 AND code_verification = :codeVerification", nativeQuery = true)
+    OrderEntity findByIdAndStatusOrderAndCodeVerification(@Param("id") Long id, @Param("codeVerification")  Long codeOrderVerification);
 }

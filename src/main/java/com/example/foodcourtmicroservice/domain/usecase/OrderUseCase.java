@@ -7,6 +7,7 @@ import com.example.foodcourtmicroservice.domain.api.IAuthenticationUserInfoServi
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
 import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException;
+import com.example.foodcourtmicroservice.domain.exceptions.MarkOrderDeliveredException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateBelongOtherRestaurantException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateStatusDisabledException;
 import com.example.foodcourtmicroservice.domain.model.Order.Order;
@@ -70,6 +71,17 @@ public class OrderUseCase implements IOrderServicePort {
                 throw new IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException();
             }
         });
+    }
+
+    @Override
+    public void markOrderDelivered(Long id, Long codeOrderVerification) {
+        Order order = orderPersistencePort.validateIdAndStatusOrderAndCodeVerification(id, codeOrderVerification);
+        if(order != null){
+            order.setOrderStatusEntity(OrderStatus.DELIVERED);
+            orderPersistencePort.saveOrder(order);
+        }   else{
+            throw new MarkOrderDeliveredException();
+        }
     }
 
 

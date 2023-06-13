@@ -8,9 +8,11 @@ import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.Orde
 import com.example.foodcourtmicroservice.domain.api.IAuthenticationUserInfoServicePort;
 import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException;
+import com.example.foodcourtmicroservice.domain.exceptions.MarkOrderDeliveredException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateBelongOtherRestaurantException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateStatusDisabledException;
 import com.example.foodcourtmicroservice.domain.model.Order.Order;
+import com.example.foodcourtmicroservice.domain.model.Order.OrderStatus;
 import com.example.foodcourtmicroservice.domain.model.Order.PlateOrder;
 import com.example.foodcourtmicroservice.domain.model.Plate;
 import com.example.foodcourtmicroservice.domain.spi.IOrderPersistencePort;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -209,7 +212,7 @@ public class OrderUseCaseTest {
         verify(platePersistencePort, times(1)).findByIdAndIdRestaurant(1L, idRestaurant);
         verify(orderPersistencePort, never()).createOrder(any(Order.class), anyList());
     }
-    
+
 
     @Test
     @DisplayName("Test: getPaginationOrderEmployee - Successful")
@@ -332,6 +335,47 @@ public class OrderUseCaseTest {
         verify(authenticationUserInfoServicePort, times(1)).getIdUserFromToken();
         verify(orderPersistencePort, times(1)).validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong(), anyInt());
         verify(orderPersistencePort, never()).saveOrder(any(Order.class));
+    }
+
+
+    @Test
+    @DisplayName("Test: markOrderDelivered - Success")
+    public void markOrderDeliveredSuccessfulTest() {
+        // Arrange
+
+        Long orderId = 1L;
+        Long codeOrderVerification = 123456L;
+        Order order = new Order();
+        order.setId(orderId);
+        order.setCodeVerification(codeOrderVerification);
+
+        when(orderPersistencePort.validateIdAndStatusOrderAndCodeVerification(orderId, codeOrderVerification)).thenReturn(order);
+
+        // Act
+
+        assertDoesNotThrow(() -> orderUseCase.markOrderDelivered(orderId, codeOrderVerification));
+
+        // Assert
+
+        verify(orderPersistencePort, times(1)).saveOrder(order);
+        assertEquals(OrderStatus.DELIVERED, order.getOrderStatusEntity());
+    }
+
+    @Test
+    @DisplayName("Test: markOrderDelivered - Failure (MarkOrderDeliveredException)")
+    public void markOrderDeliveredFailureTest() {
+        // Arrange
+
+        Long orderId = 1L;
+        Long codeOrderVerification = 123456L;
+
+        when(orderPersistencePort.validateIdAndStatusOrderAndCodeVerification(orderId, codeOrderVerification)).thenReturn(null);
+
+        // Act & Assert
+
+        assertThrows(MarkOrderDeliveredException.class, () -> orderUseCase.markOrderDelivered(orderId, codeOrderVerification));
+
+        verify(orderPersistencePort, never()).saveOrder(any());
     }
 
 

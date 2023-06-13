@@ -15,6 +15,8 @@ public class Constants {
     public static final String ID_AND_ID_RESTAURANT_AND_STATUS_ORDER_NOT_FOUND = "Order, Restaurant and Status order not found, Please, the order must belong to the same restaurant and pending status.";
     public static final String DIFFERENT_RESTAURANT_ERROR = "The owner belong other restaurant.";
     public static final String UPDATE_PLATE_OK = "Updated information.";
+    public static final String ORDER_DELIVERED_MARKED = "The Order was delivered.";
+    public static final String ORDER_DELIVERED_MARKED_EXCEPTION = "Order, Status or verification code is wrong.";
     public static final String UPDATE_STATUS_PLATE = "Status updated plate.";
     public static final String CATEGORY_EXCEPTION = "Category not found.";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";

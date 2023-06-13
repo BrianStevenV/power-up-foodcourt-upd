@@ -13,4 +13,5 @@ public interface IOrderServicePort {
     Page<OrderPaginationEmployeeResponseDto> getPaginationOrderForEmployee(Long idRestaurant, OrderStatusRequestDto orderStatusRequestDto, Integer sizePage);
 
     void employeeAssignedOrder(EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto);
+    void markOrderDelivered(Long id, Long codeOrderVerification);
 }
