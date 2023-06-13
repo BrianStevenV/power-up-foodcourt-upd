@@ -18,6 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,15 +84,15 @@ public class FeignClientMessengerTwilioUseCaseTest {
         Order order = new Order();
         OrderEntity orderEntity = new OrderEntity();
 
-        when(orderPersistencePort.saveOrder(order)).thenReturn(orderEntity);
+        doNothing().when(orderPersistencePort).saveOrder(order);
 
         // Act
 
-        OrderEntity result = orderPersistencePort.saveOrder(order);
+        orderPersistencePort.saveOrder(order);
 
         // Assert
 
-        assertEquals(orderEntity, result);
+        verify(orderPersistencePort).saveOrder(order);
     }
 
     @Test

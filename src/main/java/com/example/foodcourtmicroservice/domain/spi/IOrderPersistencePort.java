@@ -19,9 +19,7 @@ public interface IOrderPersistencePort {
 
     Order validateIdAndIdRestaurantAndStatusOrder(Long id, Long idRestaurant, Integer orderStatus);
 
-    void employeeAssignedOrder(Order order);
-
     Order validateIdAndStatusOrder(Long id);
 
-    OrderEntity saveOrder(Order order);
+    void saveOrder(Order order);
 }

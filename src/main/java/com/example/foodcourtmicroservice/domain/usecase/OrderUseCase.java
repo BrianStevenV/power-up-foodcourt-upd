@@ -65,7 +65,7 @@ public class OrderUseCase implements IOrderServicePort {
             if(order != null){
                 order.setIdEmployee(idEmployee);
                 order.setOrderStatusEntity(OrderStatus.IN_PREPARATION);
-                orderPersistencePort.employeeAssignedOrder(order);
+                orderPersistencePort.saveOrder(order);
             }   else {
                 throw new IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException();
             }

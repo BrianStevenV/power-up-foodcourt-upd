@@ -303,7 +303,7 @@ public class OrderUseCaseTest {
 
         verify(authenticationUserInfoServicePort, times(1)).getIdUserFromToken();
         verify(orderPersistencePort, times(2)).validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong(), anyInt());
-        verify(orderPersistencePort, times(2)).employeeAssignedOrder(any(Order.class));
+        verify(orderPersistencePort, times(2)).saveOrder(any(Order.class));
     }
 
     @Test
@@ -331,7 +331,7 @@ public class OrderUseCaseTest {
 
         verify(authenticationUserInfoServicePort, times(1)).getIdUserFromToken();
         verify(orderPersistencePort, times(1)).validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong(), anyInt());
-        verify(orderPersistencePort, never()).employeeAssignedOrder(any(Order.class));
+        verify(orderPersistencePort, never()).saveOrder(any(Order.class));
     }
 
 
