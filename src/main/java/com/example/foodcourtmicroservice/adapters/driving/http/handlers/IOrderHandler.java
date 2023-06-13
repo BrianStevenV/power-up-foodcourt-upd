@@ -10,4 +10,6 @@ public interface IOrderHandler {
     void createOrder(OrderRequestDto order);
     Page<OrderPaginationEmployeeResponseDto> getPaginationOrderForEmployee(Long idRestaurant, OrderStatusRequestDto orderStatusRequestDto, Integer sizePage);
     void employeeAssignedOrder(EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto);
+
+    String markOrderReady(Long id);
 }

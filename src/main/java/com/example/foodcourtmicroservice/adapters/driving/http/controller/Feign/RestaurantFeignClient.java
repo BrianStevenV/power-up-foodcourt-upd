@@ -1,4 +1,4 @@
-package com.example.foodcourtmicroservice.adapters.driving.http.controller;
+package com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign;
 
 
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.UserResponseDto;

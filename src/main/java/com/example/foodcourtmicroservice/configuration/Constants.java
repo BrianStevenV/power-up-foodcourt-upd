@@ -19,6 +19,8 @@ public class Constants {
     public static final String CATEGORY_EXCEPTION = "Category not found.";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
     public static final String ID_UPDATE_NOT_FOUND = "Id Plate not is found.";
+    public static final String MARK_ORDER_READY = "The order is ready.";
+    public static final String ORDER_TO_READY_NOT_AVAILABLE_EXCEPTION = "Order to ready not available.";
     public static final String RESPONSE_MESSAGE_KEY = "message";
     public static final String RESTAURANT_CREATED_MESSAGE = "Restaurant created successfully.";
     public static final String PLATE_CREATED_MESSAGE = "Plate created successfully.";

@@ -219,7 +219,7 @@ public class OrderUseCaseTest {
         Long idRestaurant = 1L;
         OrderStatusRequestDto orderStatus = OrderStatusRequestDto.PENDING;
         Integer sizePage = 10;
-        List<OrderEntity> orderEntities = Collections.singletonList(new OrderEntity(5L, 5L, LocalDate.now(), OrderStatusEntity.PENDING, 5L, 5L));
+        List<OrderEntity> orderEntities = Collections.singletonList(new OrderEntity(5L, 5L, LocalDate.now(), OrderStatusEntity.PENDING, 5L, 5L, null));
         Page<OrderEntity> orderEntityPage = new PageImpl<>(orderEntities);
 
         // Create a custom matcher for the method arguments
@@ -275,12 +275,6 @@ public class OrderUseCaseTest {
         assertEquals(0, result.getTotalElements());
 
     }
-
-
-
-
-    // ------->
-
 
     @Test
     @DisplayName("Test: employeeAssignedOrder - Success")

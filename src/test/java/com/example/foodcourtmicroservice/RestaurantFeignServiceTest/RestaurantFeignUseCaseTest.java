@@ -1,6 +1,6 @@
 package com.example.foodcourtmicroservice.RestaurantFeignServiceTest;
 
-import com.example.foodcourtmicroservice.adapters.driving.http.controller.RestaurantFeignClient;
+import com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign.RestaurantFeignClient;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.RoleResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.UserResponseDto;
 import com.example.foodcourtmicroservice.domain.exceptions.NoProviderException;

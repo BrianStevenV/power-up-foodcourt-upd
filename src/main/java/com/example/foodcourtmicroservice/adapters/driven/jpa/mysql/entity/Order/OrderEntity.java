@@ -32,4 +32,6 @@ public class OrderEntity {
 
     @JoinColumn(name = "id_restaurant")
     private Long idRestaurant;
+
+    private Long codeVerification;
 }
