@@ -68,20 +68,14 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     }
 
     @Override
-    public void employeeAssignedOrder(Order order) {
-        orderRepository.save(orderEntityMapper.toOrderEntity(order));
-    }
-
-    @Override
     public Order validateIdAndStatusOrder(Long id) {
         OrderEntity orderEntity = orderRepository.findByIdAndStatusOrder(id);
         return orderEntityMapper.toOrder(orderEntity);
     }
 
     @Override
-    public OrderEntity saveOrder(Order order) {
-        OrderEntity orderEntity = orderEntityMapper.toOrderEntity(order);
-        return orderRepository.save(orderEntity);
+    public void saveOrder(Order order) {
+        orderRepository.save(orderEntityMapper.toOrderEntity(order));
     }
 
 }
