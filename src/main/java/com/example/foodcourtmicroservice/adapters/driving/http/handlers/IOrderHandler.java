@@ -14,4 +14,6 @@ public interface IOrderHandler {
     String markOrderReady(Long id);
 
     void markOrderDelivered(Long id, Long codeOrderVerification);
+
+    void cancelToOrder(Long id);
 }

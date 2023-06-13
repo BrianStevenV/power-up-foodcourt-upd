@@ -6,6 +6,7 @@ import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderPaginationEmployeeResponseDto;
 import com.example.foodcourtmicroservice.domain.api.IAuthenticationUserInfoServicePort;
+import com.example.foodcourtmicroservice.domain.exceptions.CancelToOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException;
 import com.example.foodcourtmicroservice.domain.exceptions.MarkOrderDeliveredException;
@@ -376,6 +377,48 @@ public class OrderUseCaseTest {
         assertThrows(MarkOrderDeliveredException.class, () -> orderUseCase.markOrderDelivered(orderId, codeOrderVerification));
 
         verify(orderPersistencePort, never()).saveOrder(any());
+    }
+
+    @Test
+    @DisplayName("Test: cancelToOrder - Success")
+    public void cancelToOrderSuccessfulTest() {
+        // Arrange
+
+        Long id = 1L;
+        Long idClient = 123L;
+        Order order = new Order();
+        order.setId(id);
+        order.setIdClient(idClient);
+        order.setOrderStatusEntity(OrderStatus.PENDING);
+
+        when(authenticationUserInfoServicePort.getIdUserFromToken()).thenReturn(idClient);
+        when(orderPersistencePort.ValidateIdAndStatusOrderAndIdClient(id, idClient)).thenReturn(order);
+
+
+        // Act
+
+        assertDoesNotThrow(() -> orderUseCase.cancelToOrder(id));
+
+        // Assert
+
+        verify(orderPersistencePort, Mockito.times(1)).saveOrder(order);
+        assertEquals(OrderStatus.CANCELED, order.getOrderStatusEntity());
+    }
+
+    @Test
+    @DisplayName("Test: cancelToOrder - Failure (CancelToOrderException)")
+    public void cancelToOrderFailureTest() {
+        // Arrange
+
+        Long id = 1L;
+        Long idClient = 123L;
+
+        when(authenticationUserInfoServicePort.getIdUserFromToken()).thenReturn(idClient);
+        when(orderPersistencePort.ValidateIdAndStatusOrderAndIdClient(id, idClient)).thenReturn(null);
+
+        // Act and Assert
+
+        assertThrows(CancelToOrderException.class, () -> orderUseCase.cancelToOrder(id));
     }
 
 

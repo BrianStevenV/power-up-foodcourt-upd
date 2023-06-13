@@ -14,4 +14,5 @@ public interface IOrderServicePort {
 
     void employeeAssignedOrder(EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto);
     void markOrderDelivered(Long id, Long codeOrderVerification);
+    void cancelToOrder(Long id);
 }

@@ -4,6 +4,7 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.Ca
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.DataDuplicateViolationException;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.PaginationException;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantEntityNotFoundException;
+import com.example.foodcourtmicroservice.domain.exceptions.CancelToOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.DifferentRestaurantException;
 import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException;
@@ -28,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.foodcourtmicroservice.configuration.Constants.CANCEL_TO_ORDER_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.CATEGORY_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.CLIENT_HAS_ORDER_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.DATA_DUPLICATE_RESTAURANT_DTO;
@@ -151,5 +153,11 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleMarkOrderDeliveredException(MarkOrderDeliveredException markOrderDeliveredException){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY,ORDER_DELIVERED_MARKED_EXCEPTION ));
+    }
+
+    @ExceptionHandler(CancelToOrderException.class)
+    public ResponseEntity<Map<String, String>> handleCancelToOrderException(CancelToOrderException cancelToOrderException){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, CANCEL_TO_ORDER_EXCEPTION));
     }
 }
