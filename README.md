@@ -61,7 +61,7 @@ An owner can change the status of the plate of his restaurant, if it is enabled 
 ENDPOINT: /foodCourt/plate/plate/status/{enabled}
 ```JSON
 {
-  TRUE
+  "TRUE",
   "name": "pepo",
   "idRestaurant": 35
 }
@@ -183,7 +183,7 @@ will return the following information:
 ```
 If the employee enters a wrong value, you will get the following information: 
 ```JSON
-Order, Status or verification code is wrong.
+"Order, Status or verification code is wrong."
 ```
 Finally, an action that a customer user can take, if the status of the order is pending, then he can cancel the order:
 ENDPOINT: /foodCourt/orders/action/cancel/{id}
@@ -205,7 +205,7 @@ If the customer tries to cancel an order that is in preparation, then it will re
 To accompany all this interaction of the employee, the employee can paginate and see in an orderly manner the orders that are in your system, for this you need to be logged in, enter the idRestaurant, the different states of the orders by which you want to filter and the number of pages for which you want the action: 
 ```JSON
 56
-PENDING
+"PENDING -> ENUM"
 8
 ```
 
