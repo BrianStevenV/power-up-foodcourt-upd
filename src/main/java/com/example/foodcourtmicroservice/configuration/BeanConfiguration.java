@@ -3,12 +3,14 @@ package com.example.foodcourtmicroservice.configuration;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter.CategoryMysqlAdapter;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter.Order.OrderMysqlAdapter;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter.RestaurantMysqlAdapter;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IEmailUsersEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.Order.IOrderEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.Order.IOrderPlateEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.Order.IOrderStatusEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IOrderPlateRepository;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IOrderRepository;
 import com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign.IMessengerFeignClient;
+import com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign.ITraceabilityFeignClient;
 import com.example.foodcourtmicroservice.domain.api.IAuthenticationUserInfoServicePort;
 import com.example.foodcourtmicroservice.domain.api.IMessengerTwilioServicePort;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
@@ -59,6 +61,7 @@ public class BeanConfiguration {
     // Order
     private final IOrderRepository orderRepository;
     private final IOrderEntityMapper orderEntityMapper;
+    private final IEmailUsersEntityMapper emailUsersEntityMapper;
 
     // OrderPlate
     private final IOrderPlateRepository orderPlateRepository;
@@ -68,23 +71,27 @@ public class BeanConfiguration {
     // Twilio Feign Client
     private final IMessengerFeignClient messengerFeignClient;
 
+    // Traceability Feign Client
+
+    private final ITraceabilityFeignClient traceabilityFeignClient;
+
     @Bean
     public IMessengerTwilioServicePort messengerTwilioServicePort(){
-        return new FeignClientMessengerTwilioUseCase(messengerFeignClient, orderPersistencePort());
+        return new FeignClientMessengerTwilioUseCase(messengerFeignClient, orderPersistencePort(), traceabilityFeignClient);
     }
 
     @Bean
     public FeignClientMessengerTwilioUseCase feignClientMessengerTwilioUseCase(){
-        return new FeignClientMessengerTwilioUseCase(messengerFeignClient, orderPersistencePort());
+        return new FeignClientMessengerTwilioUseCase(messengerFeignClient, orderPersistencePort(), traceabilityFeignClient);
     }
 
     @Bean
     public IOrderPersistencePort orderPersistencePort(){
-        return new OrderMysqlAdapter(orderRepository, orderPlateRepository, orderEntityMapper,  orderPlateEntityMapper, orderStatusEntityMapper);
+        return new OrderMysqlAdapter(orderRepository, orderPlateRepository, orderEntityMapper,  orderPlateEntityMapper, orderStatusEntityMapper, emailUsersEntityMapper);
     }
     @Bean
     public IOrderServicePort orderServicePort(){
-        return new OrderUseCase(orderPersistencePort(), platePersistencePort(), restaurantPersistencePort(), authenticationUserInfoServicePort);
+        return new OrderUseCase(orderPersistencePort(), platePersistencePort(), restaurantPersistencePort(), authenticationUserInfoServicePort, traceabilityFeignClient);
     }
     @Bean
     public IRestaurantPersistencePort restaurantPersistencePort(){

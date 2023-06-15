@@ -2,6 +2,7 @@ package com.example.foodcourtmicroservice.MessengerFeignServiceTest;
 
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderEntity;
 import com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign.IMessengerFeignClient;
+import com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign.ITraceabilityFeignClient;
 import com.example.foodcourtmicroservice.domain.exceptions.OrderToReadyNotAvailableException;
 import com.example.foodcourtmicroservice.domain.model.Order.Order;
 import com.example.foodcourtmicroservice.domain.model.Order.OrderStatus;
@@ -31,11 +32,13 @@ public class FeignClientMessengerTwilioUseCaseTest {
     private IMessengerFeignClient messengerFeignClient;
     @Mock
     private IOrderPersistencePort orderPersistencePort;
+    @Mock
+    private ITraceabilityFeignClient traceabilityFeignClient;
     private FeignClientMessengerTwilioUseCase messengerTwilioUseCase;
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.openMocks(this);
-        messengerTwilioUseCase = new FeignClientMessengerTwilioUseCase(messengerFeignClient, orderPersistencePort);
+        messengerTwilioUseCase = new FeignClientMessengerTwilioUseCase(messengerFeignClient, orderPersistencePort, traceabilityFeignClient);
     }
 
     @Test

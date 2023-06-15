@@ -49,13 +49,13 @@ public class PlateUseCaseTest {
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
 
+    @Mock
     private IAuthenticationUserInfoServicePort authenticationUserInfoServicePort;
 
     private PlateUseCase plateUseCase;
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.openMocks(this);
-        authenticationUserInfoServicePort = Mockito.mock(IAuthenticationUserInfoServicePort.class);
         plateUseCase = new PlateUseCase(platePersistencePort, restaurantPersistencePort, categoryPersistencePort, authenticationUserInfoServicePort);
     }
 
