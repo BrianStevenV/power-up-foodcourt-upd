@@ -11,7 +11,7 @@ example of the request:
   "phone": "3116805083",
   "urlLogotype": "example",
   "nit": "6642",
-  "idOwner": "272945367".
+  "idOwner": "272945367"
 }
 ```
 will return in a success message :
@@ -46,15 +46,17 @@ ENDPOINT: /foodCourt/plate/
   "description": "ploye"
 }
 ```
+
 If the owner tries to update information he will get the following message:
+
 ````JSON
-"The owner belongs other restaurant."
+{"The owner belongs other restaurant."}
 ```
 An owner can change the status of the plate of his restaurant, if it is enabled or disabled but he can only change the status of plates of his own restaurant.
 ENDPOINT: /foodCourt/plate/plate/status/{enabled}
 ``JSON
-TRUE
 {
+  TRUE
   "name": "pepo",
   "idRestaurant": 35
 }
@@ -62,21 +64,28 @@ TRUE
 
 A client can interact with the application by means of queries and orders, firstly, it allows the client endpoints to query the restaurants and dishes that are available, these will be returned by means of a pagination where filters can be applied or not to it.
 ENDPOINT: /foodCourt/pagination/restaurant
+
 ``JSON
+{
 7
 name -> sorting profile
+}
 ```
 and will return:
 
 ````JSON
+{
 "LIST OF RESTAURANTS FOUND IN THE SYSTEM."
+}
 ```
 ENDPOINT: /foodCourt/pagination/plate
 ````JSON
+{
 restaurantName
 sizePage 
 sortBy -> sort profile
 category -> optional filter
+}
 ```
 
 A customer when he has navigated through our application, can place an order, for this he registers the name of the restaurant and can place all the orders of the available dishes that are in that restaurant, if the customer orders a dish from another restaurant the application will not allow to register the order, if he enters incorrect values neither and if he enters a dish that is not available it will also return an exception message:
@@ -108,16 +117,20 @@ Customer already has an order, it must first be fulfilled in order to assign ano
 
 An employee can interact with the application through actions that have an impact on the management of the restaurant service, below we will see some important actions:
 ENDPOINT: /foodCourt/orders/employee
+```JSON
 {
   "idRestaurant": 43,
   "idOrder": [
     32
   ]
 }
+```
 and will have for successful response: 
+```JSON
 {
   "message": "Employee successfully assigned."
 }
+```
 If, in this case, a wrong value is registered, you will get the following error:
 ```JSON
 Order, Restaurant and Status order not found, Please, the order must belong to the same restaurant and pending status
