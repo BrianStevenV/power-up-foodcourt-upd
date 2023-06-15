@@ -35,7 +35,10 @@ ENDPOINT: /foodCourt/plate/{nameRestaurant}/categoryPlate}
 then it will return a success message.
 If the restaurant is different, then it will return an error message, because a restaurant owner can only add dishes to his own restaurant:
 ```JSON
-"The owner belongs other restaurant."
+{
+  "message":"The owner belongs other restaurant."
+}
+
 ```
 The owner is the only one who can update the information of the dishes of his restaurant, for this you need to be logged in and have the restaurant registered to his person to make the change:
 ENDPOINT: /foodCourt/plate/
@@ -50,7 +53,9 @@ ENDPOINT: /foodCourt/plate/
 If the owner tries to update information he will get the following message:
 
 ````JSON
-{"The owner belongs other restaurant."}
+{
+  "message":"The owner belongs other restaurant."
+}
 ```
 An owner can change the status of the plate of his restaurant, if it is enabled or disabled but he can only change the status of plates of his own restaurant.
 ENDPOINT: /foodCourt/plate/plate/status/{enabled}
@@ -67,24 +72,24 @@ ENDPOINT: /foodCourt/pagination/restaurant
 
 ``JSON
 {
-7
-name -> sorting profile
+  "sizePage": 5
+  "name": "-> sorting profile"
 }
 ```
 and will return:
 
 ````JSON
 {
-"LIST OF RESTAURANTS FOUND IN THE SYSTEM."
+  "message": LIST OF RESTAURANTS FOUND IN THE SYSTEM."
 }
 ```
 ENDPOINT: /foodCourt/pagination/plate
 ````JSON
 {
-restaurantName
-sizePage 
-sortBy -> sort profile
-category -> optional filter
+"restaurantName":"example",
+"sizePage":6 
+"sortBy": "-> sort profile",
+"category" :"-> optional filter"
 }
 ```
 
@@ -101,18 +106,30 @@ ENDPOINT: /foodCourt/order/
   ]
 }
 ```JSON.
-"Order created successfully."
+{
+  "message":"Order created successfully."
+}
+
 ```
 If you violate any of the above validations, then you may get one of the following validations in response:
 ````JSON
-"The plate is not available."
+
+{
+  "message":"The plate is not available."
+}
 ```
 ````JSON
-"Plate belong other restaurant or Plate not found, you can only order food from the same restaurant."
+{
+  "message":"Plate belong other restaurant or Plate not found, you can only order food from the same restaurant."
+}
+
 ```
 A customer can only have one order active in the system, if the customer wants to place another order having one active, then he will have the following information: 
 ````JSON
-Customer already has an order, it must first be fulfilled in order to assign another.
+{
+  "message":"Customer already has an order, it must first be fulfilled in order to assign another."
+}
+
 ```
 
 An employee can interact with the application through actions that have an impact on the management of the restaurant service, below we will see some important actions:
