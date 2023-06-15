@@ -52,14 +52,14 @@ ENDPOINT: /foodCourt/plate/
 
 If the owner tries to update information he will get the following message:
 
-````JSON
+```JSON
 {
   "message":"The owner belongs other restaurant."
 }
 ```
 An owner can change the status of the plate of his restaurant, if it is enabled or disabled but he can only change the status of plates of his own restaurant.
 ENDPOINT: /foodCourt/plate/plate/status/{enabled}
-``JSON
+```JSON
 {
   TRUE
   "name": "pepo",
@@ -70,7 +70,7 @@ ENDPOINT: /foodCourt/plate/plate/status/{enabled}
 A client can interact with the application by means of queries and orders, firstly, it allows the client endpoints to query the restaurants and dishes that are available, these will be returned by means of a pagination where filters can be applied or not to it.
 ENDPOINT: /foodCourt/pagination/restaurant
 
-``JSON
+```JSON
 {
   "sizePage": 5
   "name": "-> sorting profile"
@@ -78,13 +78,13 @@ ENDPOINT: /foodCourt/pagination/restaurant
 ```
 and will return:
 
-````JSON
+```JSON
 {
-  "message": LIST OF RESTAURANTS FOUND IN THE SYSTEM."
+  "message": "LIST OF RESTAURANTS FOUND IN THE SYSTEM."
 }
 ```
 ENDPOINT: /foodCourt/pagination/plate
-````JSON
+```JSON
 {
 "restaurantName":"example",
 "sizePage":6 
@@ -105,6 +105,9 @@ ENDPOINT: /foodCourt/order/
     }
   ]
 }
+```
+
+
 ```JSON.
 {
   "message":"Order created successfully."
@@ -112,20 +115,21 @@ ENDPOINT: /foodCourt/order/
 
 ```
 If you violate any of the above validations, then you may get one of the following validations in response:
-````JSON
+```JSON
 
 {
   "message":"The plate is not available."
 }
 ```
-````JSON
+
+```JSON
 {
   "message":"Plate belong other restaurant or Plate not found, you can only order food from the same restaurant."
 }
 
 ```
 A customer can only have one order active in the system, if the customer wants to place another order having one active, then he will have the following information: 
-````JSON
+```JSON
 {
   "message":"Customer already has an order, it must first be fulfilled in order to assign another."
 }
@@ -172,13 +176,13 @@ ENDPOINT: /foodCourt/orders/action/delivered/
 8454261904810968685
 ```
 will return the following information: 
-````JSON
+```JSON
 {
   "message": "The Order was delivered."
 }
 ```
 If the employee enters a wrong value, you will get the following information: 
-````JSON
+```JSON
 Order, Status or verification code is wrong.
 ```
 Finally, an action that a customer user can take, if the status of the order is pending, then he can cancel the order:
@@ -187,13 +191,17 @@ ENDPOINT: /foodCourt/orders/action/cancel/{id}
 56
 ```
 will return the following message:
+```JSON
 {
   "message": "The order is cancelled."
 }
+```
 If the customer tries to cancel an order that is in preparation, then it will return the following information:
+```JSON
 {
   "error": "Sorry, The order is in preparation and is not possible to cancel it."
 }
+```
 To accompany all this interaction of the employee, the employee can paginate and see in an orderly manner the orders that are in your system, for this you need to be logged in, enter the idRestaurant, the different states of the orders by which you want to filter and the number of pages for which you want the action: 
 ```JSON
 56
