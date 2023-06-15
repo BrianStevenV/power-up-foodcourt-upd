@@ -154,7 +154,7 @@ and will have for successful response:
 ```
 If, in this case, a wrong value is registered, you will get the following error:
 ```JSON
-Order, Restaurant and Status order not found, Please, the order must belong to the same restaurant and pending status
+"Order, Restaurant and Status order not found, Please, the order must belong to the same restaurant and pending status"
 ```
 An employee can be assigned to one or several orders, for that reason, the application receives a list of order ids.
 When an employee takes an order, the order status changes from pending to preparation automatically, the employee just by being logged in and using the application assigns the employee's id to the order without the need to pass his information directly through the order.
