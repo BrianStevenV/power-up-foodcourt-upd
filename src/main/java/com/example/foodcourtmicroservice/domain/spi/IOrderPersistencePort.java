@@ -2,9 +2,9 @@ package com.example.foodcourtmicroservice.domain.spi;
 
 
 
-import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderEntity;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderPaginationEmployeeResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
+import com.example.foodcourtmicroservice.domain.model.Order.EmailUser;
 import com.example.foodcourtmicroservice.domain.model.Order.Order;
 import com.example.foodcourtmicroservice.domain.model.Order.PlateOrder;
 import org.springframework.data.domain.Page;
@@ -25,4 +25,5 @@ public interface IOrderPersistencePort {
     Order ValidateIdAndStatusOrderAndIdClient(Long id, Long idClient);
 
     void saveOrder(Order order);
+    EmailUser getUserEmail(Long id);
 }

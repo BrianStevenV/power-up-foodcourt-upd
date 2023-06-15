@@ -1,5 +1,7 @@
 package com.example.foodcourtmicroservice.domain.usecase;
 
+import com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign.ITraceabilityFeignClient;
+import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Logs.LogsOrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.EmployeeAssignedOrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderPaginationEmployeeResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
@@ -11,6 +13,7 @@ import com.example.foodcourtmicroservice.domain.exceptions.IdOrderAndIdRestauran
 import com.example.foodcourtmicroservice.domain.exceptions.MarkOrderDeliveredException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateBelongOtherRestaurantException;
 import com.example.foodcourtmicroservice.domain.exceptions.PlateStatusDisabledException;
+import com.example.foodcourtmicroservice.domain.model.Order.EmailUser;
 import com.example.foodcourtmicroservice.domain.model.Order.Order;
 import com.example.foodcourtmicroservice.domain.model.Order.OrderStatus;
 import com.example.foodcourtmicroservice.domain.model.Order.PlateOrder;
@@ -28,13 +31,15 @@ public class OrderUseCase implements IOrderServicePort {
     private final IPlatePersistencePort platePersistencePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IAuthenticationUserInfoServicePort authenticationUserInfoServicePort;
+    private final ITraceabilityFeignClient traceabilityFeignClient;
 
     public OrderUseCase(IOrderPersistencePort orderPersistencePort, IPlatePersistencePort platePersistencePort, IRestaurantPersistencePort restaurantPersistencePort,
-                        IAuthenticationUserInfoServicePort authenticationUserInfoServicePort) {
+                        IAuthenticationUserInfoServicePort authenticationUserInfoServicePort, ITraceabilityFeignClient traceabilityFeignClient) {
         this.orderPersistencePort = orderPersistencePort;
         this.platePersistencePort = platePersistencePort;
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.authenticationUserInfoServicePort = authenticationUserInfoServicePort;
+        this.traceabilityFeignClient = traceabilityFeignClient;
     }
 
     @Override
@@ -64,13 +69,21 @@ public class OrderUseCase implements IOrderServicePort {
         Long idEmployee = authenticationUserInfoServicePort.getIdUserFromToken();
         employeeAssignedOrderRequestDto.getIdOrder().forEach(idOrder -> {
             Order order = orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(idOrder, employeeAssignedOrderRequestDto.getIdRestaurant(), 0);
+
             if(order != null){
+
                 order.setIdEmployee(idEmployee);
                 order.setOrderStatusEntity(OrderStatus.IN_PREPARATION);
                 orderPersistencePort.saveOrder(order);
+
+
+                LogsOrderRequestDto logsOrderRequestDto = createLogsOrderRequestDto(order,OrderStatusRequestDto.PENDING, OrderStatusRequestDto.IN_PREPARATION);
+                traceabilityFeignClient.createLogs(logsOrderRequestDto);
+
             }   else {
                 throw new IdOrderAndIdRestaurantAndOrderStatusPendingIsFalseException();
             }
+
         });
     }
 
@@ -80,6 +93,11 @@ public class OrderUseCase implements IOrderServicePort {
         if(order != null){
             order.setOrderStatusEntity(OrderStatus.DELIVERED);
             orderPersistencePort.saveOrder(order);
+
+
+            LogsOrderRequestDto logsOrderRequestDto = createLogsOrderRequestDto(order,OrderStatusRequestDto.READY, OrderStatusRequestDto.DELIVERED);
+            traceabilityFeignClient.createLogs(logsOrderRequestDto);
+
         }   else{
             throw new MarkOrderDeliveredException();
         }
@@ -89,9 +107,14 @@ public class OrderUseCase implements IOrderServicePort {
     public void cancelToOrder(Long id) {
         Long idClient = authenticationUserInfoServicePort.getIdUserFromToken();
         Order order =  orderPersistencePort.ValidateIdAndStatusOrderAndIdClient(id, idClient);
+
         if(order != null){
             order.setOrderStatusEntity(OrderStatus.CANCELED);
             orderPersistencePort.saveOrder(order);
+
+            LogsOrderRequestDto logsOrderRequestDto = createLogsOrderRequestDto(order,OrderStatusRequestDto.PENDING, OrderStatusRequestDto.CANCELED);
+            traceabilityFeignClient.createLogs(logsOrderRequestDto);
+
         }   else{
             throw new CancelToOrderException();
         }
@@ -127,6 +150,25 @@ public class OrderUseCase implements IOrderServicePort {
             throw new PlateBelongOtherRestaurantException();
         }
     }
+
+
+    private LogsOrderRequestDto createLogsOrderRequestDto(Order order, OrderStatusRequestDto statusBefore, OrderStatusRequestDto statusNew) {
+        EmailUser emailPair = orderPersistencePort.getUserEmail(order.getId());
+
+        String emailClient = emailPair != null ? emailPair.getEmailClient() : "";
+        String emailEmployee = emailPair != null ? emailPair.getEmailEmployee() : "";
+
+        return new LogsOrderRequestDto(
+                order.getId(),
+                order.getIdClient(),
+                emailClient,
+                statusBefore,
+                statusNew,
+                order.getIdEmployee(),
+                emailEmployee
+        );
+    }
+
 
 
 }

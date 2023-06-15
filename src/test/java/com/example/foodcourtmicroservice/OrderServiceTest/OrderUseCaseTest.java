@@ -2,6 +2,7 @@ package com.example.foodcourtmicroservice.OrderServiceTest;
 
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderEntity;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderStatusEntity;
+import com.example.foodcourtmicroservice.adapters.driving.http.controller.Feign.ITraceabilityFeignClient;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.EmployeeAssignedOrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Order.OrderStatusRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderPaginationEmployeeResponseDto;
@@ -60,15 +61,17 @@ public class OrderUseCaseTest {
     private IPlatePersistencePort platePersistencePort;
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
+    @Mock
     private IAuthenticationUserInfoServicePort authenticationUserInfoServicePort;
+    @Mock
+    private ITraceabilityFeignClient traceabilityFeignClient;
 
     private OrderUseCase orderUseCase;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        authenticationUserInfoServicePort = Mockito.mock(IAuthenticationUserInfoServicePort.class);
-        orderUseCase = new OrderUseCase(orderPersistencePort, platePersistencePort, restaurantPersistencePort, authenticationUserInfoServicePort);
+        orderUseCase = new OrderUseCase(orderPersistencePort, platePersistencePort, restaurantPersistencePort, authenticationUserInfoServicePort, traceabilityFeignClient);
     }
 
 
