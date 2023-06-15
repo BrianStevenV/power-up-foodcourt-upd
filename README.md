@@ -1,7 +1,9 @@
 This microservice manages all the services related to the restaurant, the information and service of restaurants, dishes, orders, data collection and actions of the user type employee with the restaurant.
 An administrator can register a restaurant in the system, for this he must log in previously to obtain the access and consume this endpoint, only the administrator type users can create restaurants and assign it to the owner type users.
 ENDPOINT: /foodCourt/restaurant/
+
 example of the request: 
+
 ```JSON
 {
   "name": "examplereadme",
@@ -10,13 +12,18 @@ example of the request:
   "urlLogotype": "example",
   "nit": "6642",
   "idOwner": "272945367".
-}```
+}
+```
 will return in a success message :
+```JSON
 {
   "message": "Restaurant created successfully."
 }
+```
+
 An owner, can enter dishes to his restaurant, for that he must register the name of his restaurant and the category of the dish, then he must enter the data of the dish:
 ENDPOINT: /foodCourt/plate/{nameRestaurant}/categoryPlate}
+
 ```JSON
 {
   "name": "PlateExample",
@@ -51,6 +58,8 @@ TRUE
   "name": "pepo",
   "idRestaurant": 35
 }
+```
+
 A client can interact with the application by means of queries and orders, firstly, it allows the client endpoints to query the restaurants and dishes that are available, these will be returned by means of a pagination where filters can be applied or not to it.
 ENDPOINT: /foodCourt/pagination/restaurant
 ``JSON
@@ -58,6 +67,7 @@ ENDPOINT: /foodCourt/pagination/restaurant
 name -> sorting profile
 ```
 and will return:
+
 ````JSON
 "LIST OF RESTAURANTS FOUND IN THE SYSTEM."
 ```
