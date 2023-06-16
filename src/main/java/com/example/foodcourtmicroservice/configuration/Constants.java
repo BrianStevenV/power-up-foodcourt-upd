@@ -21,6 +21,7 @@ public class Constants {
     public static final String UPDATE_STATUS_PLATE = "Status updated plate.";
     public static final String CATEGORY_EXCEPTION = "Category not found.";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
+    public static final String USER_NOT_FOUND_EXCEPTION = "user not found";
     public static final String ID_UPDATE_NOT_FOUND = "Id Plate not is found.";
     public static final String CANCEL_ORDER = "The order is cancelled.";
     public static final String ORDER_TO_READY_NOT_AVAILABLE_EXCEPTION = "Order to ready not available.";

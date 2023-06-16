@@ -5,6 +5,7 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderPlateEntity;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderPlateIdEmbeddeable;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.Order.OrderStatusEntity;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.UserNotFoundException;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IEmailUsersEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.Order.IOrderEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.Order.IOrderPlateEntityMapper;
@@ -95,11 +96,6 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
         orderRepository.save(orderEntityMapper.toOrderEntity(order));
     }
 
-//    @Override
-//    public EmailUser getUserEmail(Long id) {
-//        EmailUsersEntity emailUsersEntity = orderRepository.getEmailUser(id);
-//        return emailUsersEntityMapper.toEmailUser(emailUsersEntity);
-//    }
 
     @Override
     public EmailUser getUserEmail(Long id) {
@@ -113,7 +109,7 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
             return new EmailUser(emailClient, emailEmployee);
         }
 
-        return null; // o devuelve un valor predeterminado si no hay resultados
+        throw new UserNotFoundException();
     }
 
 

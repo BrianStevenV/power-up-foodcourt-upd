@@ -4,6 +4,7 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.Ca
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.DataDuplicateViolationException;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.PaginationException;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantEntityNotFoundException;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.UserNotFoundException;
 import com.example.foodcourtmicroservice.domain.exceptions.CancelToOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.ClientHasOrderException;
 import com.example.foodcourtmicroservice.domain.exceptions.DifferentRestaurantException;
@@ -45,6 +46,7 @@ import static com.example.foodcourtmicroservice.configuration.Constants.PLATE_NO
 import static com.example.foodcourtmicroservice.configuration.Constants.PLATE_STATUS_DISABLED_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.RESPONSE_ERROR_MESSAGE_KEY;
 import static com.example.foodcourtmicroservice.configuration.Constants.RESTAURANT_ENTITY_NOT_FOUND;
+import static com.example.foodcourtmicroservice.configuration.Constants.USER_NOT_FOUND_EXCEPTION;
 import static com.example.foodcourtmicroservice.configuration.Constants.WRONG_CREDENTIALS_MESSAGE;
 
 @ControllerAdvice
@@ -159,5 +161,10 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleCancelToOrderException(CancelToOrderException cancelToOrderException){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, CANCEL_TO_ORDER_EXCEPTION));
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    public  ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException userNotFoundException){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, USER_NOT_FOUND_EXCEPTION));
     }
 }
