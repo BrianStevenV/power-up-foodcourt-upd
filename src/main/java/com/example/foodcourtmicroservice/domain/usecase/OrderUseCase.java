@@ -68,7 +68,7 @@ public class OrderUseCase implements IOrderServicePort {
     public void employeeAssignedOrder(EmployeeAssignedOrderRequestDto employeeAssignedOrderRequestDto) {
         Long idEmployee = authenticationUserInfoServicePort.getIdUserFromToken();
         employeeAssignedOrderRequestDto.getIdOrder().forEach(idOrder -> {
-            Order order = orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(idOrder, employeeAssignedOrderRequestDto.getIdRestaurant(), 0);
+            Order order = orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(idOrder, employeeAssignedOrderRequestDto.getIdRestaurant());
 
             if(order != null){
 

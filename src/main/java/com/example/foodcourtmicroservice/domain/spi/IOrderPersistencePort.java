@@ -17,7 +17,7 @@ public interface IOrderPersistencePort {
 
     Page<OrderPaginationEmployeeResponseDto> getPaginationOrderForEmployee(Long id, OrderStatusRequestDto orderStatusRequestDto, Integer sizePage);
 
-    Order validateIdAndIdRestaurantAndStatusOrder(Long id, Long idRestaurant, Integer orderStatus);
+    Order validateIdAndIdRestaurantAndStatusOrder(Long id, Long idRestaurant);
 
     Order validateIdAndStatusOrder(Long id);
     Order validateIdAndStatusOrderAndCodeVerification(Long id, Long codeOrderVerification);
