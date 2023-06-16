@@ -42,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -299,8 +298,8 @@ public class OrderUseCaseTest {
         requestDto.setIdOrder(idOrders);
 
         when(authenticationUserInfoServicePort.getIdUserFromToken()).thenReturn(idEmployee);
-        when(orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(1L, idRestaurant, 0)).thenReturn(new Order());
-        when(orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(2L, idRestaurant, 0)).thenReturn(new Order());
+        when(orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(1L, idRestaurant)).thenReturn(new Order());
+        when(orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(2L, idRestaurant)).thenReturn(new Order());
 
         // Act
 
@@ -309,7 +308,7 @@ public class OrderUseCaseTest {
         // Assert
 
         verify(authenticationUserInfoServicePort, times(1)).getIdUserFromToken();
-        verify(orderPersistencePort, times(2)).validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong(), anyInt());
+        verify(orderPersistencePort, times(2)).validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong());
         verify(orderPersistencePort, times(2)).saveOrder(any(Order.class));
     }
 
@@ -329,7 +328,7 @@ public class OrderUseCaseTest {
         requestDto.setIdOrder(idOrders);
 
         when(authenticationUserInfoServicePort.getIdUserFromToken()).thenReturn(idEmployee);
-        when(orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong(), anyInt())).thenReturn(null);
+        when(orderPersistencePort.validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong())).thenReturn(null);
 
         // Act & Assert
 
@@ -337,7 +336,7 @@ public class OrderUseCaseTest {
                 orderUseCase.employeeAssignedOrder(requestDto));
 
         verify(authenticationUserInfoServicePort, times(1)).getIdUserFromToken();
-        verify(orderPersistencePort, times(1)).validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong(), anyInt());
+        verify(orderPersistencePort, times(1)).validateIdAndIdRestaurantAndStatusOrder(anyLong(), anyLong());
         verify(orderPersistencePort, never()).saveOrder(any(Order.class));
     }
 

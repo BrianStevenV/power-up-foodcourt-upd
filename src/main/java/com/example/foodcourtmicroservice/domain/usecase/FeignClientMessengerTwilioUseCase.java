@@ -37,7 +37,7 @@ public class FeignClientMessengerTwilioUseCase implements IMessengerTwilioServic
             order.setOrderStatusEntity(OrderStatus.READY);
             order.setCodeVerification(codeVerification);
 
-            LogsOrderRequestDto logsOrderRequestDto = createLogsOrderRequestDto(order,OrderStatusRequestDto.READY, OrderStatusRequestDto.DELIVERED);
+            LogsOrderRequestDto logsOrderRequestDto = createLogsOrderRequestDto(order,OrderStatusRequestDto.IN_PREPARATION, OrderStatusRequestDto.READY);
 
             traceabilityFeignClient.createLogs(logsOrderRequestDto);
             orderPersistencePort.saveOrder(order);
